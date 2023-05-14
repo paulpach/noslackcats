@@ -99,4 +99,4 @@ def is_image_url(url):
         return False
 
 if __name__ == "__main__":
-    app.start(3000)
+    app.start(port=int(os.environ.get("PORT", 3000)))
