@@ -44,7 +44,7 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: 
-            ${{ steps.meta.outputs.tags }} ${{ github.sha }}
+            ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - uses: azure/webapps-deploy@v2
