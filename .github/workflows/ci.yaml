@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: robertkelly
   AZURE_WEBAPP_NAME: nocatimages
   PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
@@ -43,8 +43,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: 
-            ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }} ${{ github.sha }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - uses: azure/webapps-deploy@v2
