@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: robertkelly
+  IMAGE_NAME: "robertkelly/noslackcats"
   AZURE_WEBAPP_NAME: nocatimages
   PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
