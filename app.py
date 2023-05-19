@@ -120,4 +120,4 @@ def is_image_url(url):
         return False
 
 if __name__ == "__main__":
-    uvicorn.run("app:api", port=int(os.environ.get("PORT", 3000)))
+    uvicorn.run("app:api", host=os.environ.get("HOST", "0.0.0.0"), port=int(os.environ.get("PORT", 3000)))
