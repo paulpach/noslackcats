@@ -1,15 +1,35 @@
 import os
 import re
 import requests
+import logging
+import uvicorn
+
+logging.basicConfig(level=logging.DEBUG)
+
+from fastapi import FastAPI, Request
 from slack_bolt.async_app import AsyncApp
+from slack_bolt.adapter.fastapi.async_handler import AsyncSlackRequestHandler
 from clarifai_grpc.channel.clarifai_channel import ClarifaiChannel
 from clarifai_grpc.grpc.api import service_pb2, service_pb2_grpc, resources_pb2
 from clarifai_grpc.grpc.api.status import status_code_pb2
+
 
 app = AsyncApp(
         token=os.environ["SLACK_BOT_TOKEN"],
         signing_secret=os.environ["SLACK_SIGNING_SECRET"]
     )
+
+app_handler = AsyncSlackRequestHandler(app)
+
+api = FastAPI()
+
+@api.post("/slack/events")
+async def endpoint(req: Request):
+    return await app_handler.handle(req)
+
+@api.get("/")
+async def root():
+    return {"message": "NoSlackCats is up!"}
 
 async def is_cat(file_bytes):
     # Get the Clarifai API key from the environment variables
@@ -59,6 +79,7 @@ async def handle_file_shared(event, say):
         file_bytes = await download_file_bytes(file_url)
         if await is_cat(file_bytes):
             await say("Come on. That looks like a :cat:!") 
+            # todo: here's where I would delete the cat image... ;) 
         # else:
             # await say("That's not a cat.")
 
@@ -99,4 +120,4 @@ def is_image_url(url):
         return False
 
 if __name__ == "__main__":
-    app.start(port=int(os.environ.get("PORT", 3000)))
+    uvicorn.run("app:api", host="0.0.0.0", port=int(os.environ.get("PORT", 3000)))
