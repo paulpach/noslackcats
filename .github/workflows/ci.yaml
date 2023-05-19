@@ -37,7 +37,7 @@ jobs:
             type=ref,event=branch
             type=ref,event=pr
             type=sha,prefix=
-            type=semver,pattern={{version}},value=v0.0.1
+            type=sha,enable=true,priority=901,prefix=,suffix=,format=long
             latest
 
       - name: Set up Docker Buildx
