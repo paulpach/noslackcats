@@ -1,4 +1,4 @@
-name: Deploy Azure WebApp
+name: Build and Deploy Azure WebApp Container
 
 on:
   push:
@@ -6,34 +6,41 @@ on:
       - main
 
 env:
-  AZURE_WEBAPP_NAME: noslackcats
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  AZURE_WEBAPP_NAME: nocatimages
   PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-  PYTHON_VERSION: 3.11
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-    - name: Install dependencies
-      run: |
-        python -m venv env
-        source env/bin/activate
-        pip install -r requirements.txt
+      - name: Build and push Docker image
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
-    - name: Zip application code
-      run: |
-        zip -r webapp.zip .
-
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ env.PUBLISH_PROFILE }}
+      # - uses: azure/webapps-deploy@v2
+      #   with:
+      #     app-name: ${{ env.IMAGE_NAME }}
+      #     publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+      #     images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
