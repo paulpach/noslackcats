@@ -64,10 +64,7 @@ async def is_cat(file_bytes):
         if concept.name.lower() == 'cat':
             cat_concept = concept
             break
-    if cat_concept is not None:
-        return True
-    else:
-        return False
+    return cat_concept is not None
 
 @app.event("file_shared")
 async def handle_file_shared(event, say):
