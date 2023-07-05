@@ -62,7 +62,6 @@ async def is_cat(file_bytes):
     for concept in response.outputs[0].data.concepts:
         if concept.name.lower() == 'cat':
             return True
-            break
     return False;
         
 @app.event("file_shared")
