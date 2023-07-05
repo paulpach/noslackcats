@@ -58,17 +58,13 @@ async def is_cat(file_bytes):
         return False
        # raise Exception(f"Request failed, status code: {response.status}")
 
-    cat_concept = None
     # loop through the concepts from Clarifai response for the one we want
     for concept in response.outputs[0].data.concepts:
         if concept.name.lower() == 'cat':
-            cat_concept = concept
+            return True
             break
-    if cat_concept is not None:
-        return True
-    else:
-        return False
-
+    return False;
+        
 @app.event("file_shared")
 async def handle_file_shared(event, say):
     file_id = event["file_id"]
